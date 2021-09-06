@@ -1,0 +1,23 @@
+# /etc/fstab: static file system information
+# Use 'blkid' to print the universally unique identifier for a
+# device; this way may be used with UUID= as a more robust way to name devices
+# that works even if disks are added and removed. See fstab(5)
+#
+#<file system>	<mount point>	<type>	<options>	<dump>	<pass>
+
+#/dev/sda1
+
+UUID=4CC4-C322 				   /boot/efi     vfat  rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,utf8,errors=remount-ro 0 2
+
+#/dev/sda2
+
+UUID=f6273a9a-2072-46a5-9dfe-3cdcd53b3473  / 		 btrfs rw,noatime,compress=zstd:3,space_cache=v2,subvolid=256,subvol=/@ 0 1
+UUID=f6273a9a-2072-46a5-9dfe-3cdcd53b3473  /home	 btrfs rw,noatime,compress=zstd:3,space_cache=v2,subvolid=258,subvol=/@home 0 0
+UUID=f6273a9a-2072-46a5-9dfe-3cdcd53b3473  /.snapshots 	 btrfs rw,noatime,compress=zstd:3,space_cache=v2,subvolid=260,subvol=/@snapshots 0 0
+
+#/dev/sda3
+UUID=7bd26622-c0ea-4fa2-b3bd-93fbb99dd64f  /Data	 ext4  rw,defaults	0 0
+
+#tmpfs
+tmpfs	/tmp	tmpfs	defaults,nosuid,nodev	0 0
+

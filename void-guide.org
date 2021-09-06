@@ -1,0 +1,38 @@
+#+Title: Void linux guide for btrfs file systems with snapper
+#+Date: 2020-09-06
+#+Author: OkuNull
+
+Hello and welcome, here i'm going to expalin the basics about to setup, configure and install *void* and independent linux distribution, there are some tricks to get work with btrfs file system, in this case, i recommend this guide if you want to have the following:
+
+1. Btrfs file system with subvolumes
+2. Create snapshots to maintain copies for your current system
+3. Configure snapper, it's relative easy on this distribution
+4. Allow cronie to create and manage snapshots automatically
+
+- *Note*: On void there's no *snapper_gui* utility, you must manage your snapshots manually
+
+** First Steps
+
+*** Preparing the iso file
+
+So let's start, first you need a USB flash drive and a Void Linux iso, where you can find it form the official website from void
+
+- Official Site: [[https://voidlinux.org/download/][/VoidIso/]]
+  - *Note*: this guide goes to /glibc/ version of void
+
+Now let's create the USB live iso, there are some many options to perform this task, most recommended programs are:
+
+1. *Windows*: [[https://rufus.ie/en/][Rufus]], [[https://www.balena.io/etcher/][Balena Etcher]], [[https://www.ventoy.net/en/download.html][Ventoy]]
+2. *MacOS*: [[https://www.balena.io/etcher/][Balena Etcher]], [[https://www.ventoy.net/en/download.html][Ventoy]]
+3. *Linux*: [[https://www.balena.io/etcher/][Balena Etcher]]
+
+*** Boot into your usb drive
+
+- In some computers you need to press *F11* or *Del* key to enter into the bios, in lenovo laptops use the *Novo Button* to enter in the boot menu, select uefi memory and you are in.
+
+
+** Installing Void
+
+There are two ways to install void, the easiest way is typing =void-installer= when you are loggin as a root user, the other way is more complicated but here i'm going to install void using =chroot= mode.
+
+- /Tip/: Void is well documented by their developers, so check it out [[https://docs.voidlinux.org/about/index.html][here]] if you have some trouble with the installation process.
