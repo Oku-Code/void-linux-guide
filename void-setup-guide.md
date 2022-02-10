@@ -54,7 +54,7 @@ There are two ways to install void one is to type `void-installer` when you are 
 Use the `nmtui` utility if you have a WLAN connection, but if you have a internet cable connection you don't need to do this
 
 
-### Updating the xbps package manager:  
+### Updating xbps package manager:  
 
 So, here we start updating the xbps package manager to this type the following commands:
 
