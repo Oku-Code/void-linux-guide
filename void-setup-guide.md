@@ -1,4 +1,4 @@
-#Void linux guide for btrfs file systems with snapper
+# Void linux guide for btrfs file systems with snapper
 
 Hello and welcome, here i'm going to explain the basics about to setup, configure and install **void** an independent linux distribution, there are some tricks to get work with btrfs file system, in this case i recommend this guide if you want to have the following:
 
@@ -6,6 +6,22 @@ Hello and welcome, here i'm going to explain the basics about to setup, configur
 2. Create snapshots to maintain copies for your current system
 3. Configure snapper, it's relative easy on this distribution
     - **Note**: snapper on void don't work automatically, i mean is not like Archlinux that you can generate snapshots if you update or remove packages, also this distribution don't have **snapper_gui** you need to manage your snapshots manually.
+
+## Table of contents
+
+The document contains the following: 
+
+1. [First steps](#first-steps)
+    - [Preparing the iso file](#preparing-the-iso-file)
+2. [Installing Void](#installing-void)
+    - [Connecting to the network](#connecting-to-the-network)
+    - [Updating xbps package manager](#updating-xbps-package-manager)
+    - [Partitioning your disk](#partitioning-your-disk)
+    - [Installing base system](#installing-base-system)
+3. [Void Chroot](#void-chroot)
+4. [Configure snapper on void](#configure-snapper-on-void)
+5. [Restoring a snapshot](#restoring-a-snapshot)
+6. [References](#references)
 
 ## First steps
 
@@ -38,12 +54,11 @@ There are two ways to install void one is to type `void-installer` when you are 
 Use the `nmtui` utility if you have a WLAN connection, but if you have a internet cable connection you don't need to do this
 
 
-### Updating the xbps packages:  
+### Updating the xbps package manager:  
 
 So, here we start updating the xbps package manager to this type the following commands:
 
 - `xbps-install -Su xbps`: This syncronize the system and perform an update to xbps package manager.
-- `xbps-install -u`: This update the entire system.
 
 ### Partitioning your disk:
 
@@ -94,7 +109,7 @@ And now lets mounted the subvolumes:
 
 Finally the efi partition:
 
-- **Efi**: `mount /dev/sdx1 /mnt/`
+- **Efi**: `mount /dev/sdx1 /mnt/boot/efi`
 
 ### Installing the base system on Void
 
@@ -131,7 +146,7 @@ This is a same process like arch with some exeptions, we review here now:
 
 Here you need to be carefull with the UUID of the disks, if you want to know the specific id use `blkid` command to see the UUIDs.
 
-- Copy the /proc/mounts file on /etc/fstab: `cp /proc/mounts /etc/mnt`
+- Copy the /proc/mounts file on /etc/fstab: `cp /proc/mounts /etc/fstab`
 
     - **Note**: Remove the innecesary lines, put the UUID for all disk and chage the last 0 for 1 on the `root` partition and 2 for the `/boot/efi` partition, the other partition leaves as it is.
     - **Note**: Add the line to the fstab file `tmpfs   /tmp     tmpfs   defaults,nosuid,nodev   0 0`, this is for the /tmp directory on the ram.
@@ -258,7 +273,7 @@ Unfortunely void doesn't have much tools like arch, void is a light iso, i'm goi
 3. Use nano to search info about your snapshot: `nano /mnt/@snapshots/*/info.xml` with `ctrl + x` you close the editor
 4. Delete the `@` subvolume like a file: `rm -r /mnt/@` => This process take a while if you have many files on there
 5. Finally restore the desire snapshot with btrfs: `btrfs subvolume snapshot /mnt/@snapshots/NUMOFSNAPSHOT/snapshot /mnt/@`
-6. Reboot your system and you done
+6. Reboot your system and you done..
 
 ## References
 
