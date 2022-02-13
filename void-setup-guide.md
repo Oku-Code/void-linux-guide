@@ -123,7 +123,7 @@ Here on void its different, in Arch you have **pacstrap** command, but here you 
 
 - Bootstraping the base-system: Now you need to install the system and the packages, here you specify what you want, this is an exmaple:
 
-    - `XBPS_ARCH=$ARCH xbps-install -S -r /mnt -R "$REPO" base-system vim git btrfs-progs networkmanager efibootmgr ntfs-3g mtools dosfstools grub-btrfs grub-x86_64-efi elogind polkit dbus` => pick your poison.
+    - `XBPS_ARCH=$ARCH xbps-install -S -r /mnt -R "$REPO" base-system vim git btrfs-progs networkmanager base-devel efibootmgr ntfs-3g mtools dosfstools grub-btrfs-runit grub-x86_64-efi elogind polkit dbus` => pick your poison.
 
 - Entering chroot mode, you need mount the following files on to your system:
     - `mount --rbind /sys /mnt/sys && mount --make-rslave /mnt/sys`
@@ -172,6 +172,12 @@ Here you need to be carefull with the UUID of the disks, if you want to know the
 
 - The configuration on this file is the same like in arch, you can find it [here](https://wiki.archlinux.org/title/Installation_guide#Network_configuration).
 
+```
+127.0.0.1   localhost
+::1         localhost
+127.0.1.1   hostname.localdomain    hostname
+```
+
 #### Enable Network Service
 
 - Choose the command depending of your connection:
@@ -189,7 +195,7 @@ Here you need to be carefull with the UUID of the disks, if you want to know the
 
 #### Create a user:
 
-- Use `useradd -mG wheel NAMEOFUSER`
+- Use `useradd -mG wheel $USER`
 - Use `paswd NAMEOFUSER` to create a new password
 - Add the user to the wheel group, `EDITOR=vim visudo` and uncomment `%wheel ALL= (ALL) ALL`
 

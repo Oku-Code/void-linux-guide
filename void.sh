@@ -22,15 +22,6 @@ void_base_setup(){
     update-grub
 }
 
-# Why they don't have a easy way to generate the fstab file?
-
-void_fstab_file(){
-    echo 'Rename the file fstab.backup to the fstab and change the UUID, also verify the IDs for the fstab file'
-    sleep 4
-    mv /void-setup-guide/fstab.backup /etc/
-    blkid
-}
-
 #Choose your favorite stuff 
 
 void_post_setup(){
