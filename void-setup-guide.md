@@ -67,6 +67,7 @@ Next is to use `cfdisk /dev/sdx` to create the partitions:
 - **Note**: if you dont know how your disk is assigned use `lsblk` command to know it.
 - You need create the `UEFI partition` and the `main partition`, with cfdisk command you can do it.
 - Change the code to efi partition to `ef00`, and write the changes to the disk.
+- Also if you have a gpt label, instead install the `gptfdisk` using the `xbps-install -Sy gptfdisk` to use gdisk or cgdisk to perform operations on your disks.
 
 #### Creating the filesystems:
 
@@ -105,17 +106,22 @@ And now lets mounted the subvolumes:
 - **Snapshots**: `mount -o compress=zstd,noatime,space_cache=v2,subvol=@snapshots /dev/sdx2 /mnt/.snapshots`
 - **Var_log**: `mount -o compress=zstd,noatime,space_cache=v2,subvol=@var_log /dev/sdx2 /var/log`
 
+> You can easily create a variable for the btrfs options like so: `BTRFS_OPTS=compress=zstd,noatime,space_cache=v2,autodegrag`
+
 #### Mount the efi partition
 
 Finally the efi partition:
 
 - **Efi**: `mount /dev/sdx1 /mnt/boot/efi`
 
+- **Note**: if you attempt to install the system with a disk with gpt labels on an MBR system remember to create a BIOS Boot Partition on your root of you disk
+this allows to install the grub bootloader properly
+
 ### Installing the base system on Void
 
 Here on void its different, in Arch you have **pacstrap** command, but here you need to setup the following varibles before your bootstraping your installation:
 
-- Defining the main repo varible: `REPO=https://alpha.de.repo.voidlinux.org/current`
+- Defining the main repo varible: `REPO=https://repo-default.voidlinux.org/current`
 
     - **Note**: if you need to look up your nearest mirror, can you find it on [mirrors](https://docs.voidlinux.org/xbps/repositories/mirrors/index.html) on the void handbook, change the mirror of your preference.
 
@@ -123,12 +129,13 @@ Here on void its different, in Arch you have **pacstrap** command, but here you 
 
 - Bootstraping the base-system: Now you need to install the system and the packages, here you specify what you want, this is an exmaple:
 
-    - `XBPS_ARCH=$ARCH xbps-install -S -r /mnt -R "$REPO" base-system vim git btrfs-progs networkmanager base-devel efibootmgr ntfs-3g mtools dosfstools grub-btrfs-runit grub-x86_64-efi elogind polkit dbus` => pick your poison.
+    - `XBPS_ARCH=$ARCH xbps-install -S -r /mnt -R "$REPO" base-system vim git btrfs-progs networkmanager base-devel efibootmgr ntfs-3g mtools dosfstools grub-btrfs-runit grub-x86_64-efi elogind polkit dbus void-repo-nonfree ` => pick your poison.
 
 - Entering chroot mode, you need mount the following files on to your system:
-    - `mount --rbind /sys /mnt/sys && mount --make-rslave /mnt/sys`
-    - `mount --rbind /dev /mnt/dev && mount --make-rslave /mnt/dev`
-    - `mount --rbind /proc /mnt/proc && mount --make-rslave /mnt/proc` => With this file will create the **fstab file**.
+
+    - `for dir in dev proc sys run; do mount --rbind /$dir /mnt/$dir; mount --make-rslave /mnt/dir; done`
+
+> Simplest way in my opinion to mount those files
 
 - Copy DNS config:
 
@@ -136,7 +143,9 @@ Here on void its different, in Arch you have **pacstrap** command, but here you 
 
 - Finally chroot into your install:
 
-    - `PS1='(chroot) # ' chroot /mnt/ /bin/bash`
+    - BTRFS_OPTS=$BTRFS_OPTS `PS1='(chroot) # ' chroot /mnt/ /bin/bash`
+
+- **Note:** this varible will be use it when you are creating the fstab file, better to keep it to make your live easier
 
 ### Void Chroot
 
@@ -146,10 +155,26 @@ This is a same process like arch with some exeptions, we review here now:
 
 Here you need to be carefull with the UUID of the disks, if you want to know the specific id use `blkid` command to see the UUIDs.
 
-- Copy the /proc/mounts file on /etc/fstab: `cp /proc/mounts /etc/fstab`
+- Store the UUIDS for the partitions there are created:
 
-    - **Note**: Remove the innecesary lines, put the UUID for all disk and chage the last 0 for 1 on the `root` partition and 2 for the `/boot/efi` partition, the other partition leaves as it is.
-    - **Note**: Add the line to the fstab file `tmpfs   /tmp     tmpfs   defaults,nosuid,nodev   0 0`, this is for the /tmp directory on the ram.
+    - `UEFI_UUID=$(blkid -s UUID -o value /dev/sdx1)`
+    - `ROOT_UUID=$(blkid -s UUID -o value /dev/sdx2)`
+
+> Remember sdx or nvmex is your partition
+
+- Use the cat command to create the fstab file
+
+    - ```
+        cat << EOF > /etc/fstab
+            UUID=$UEFI_UUID    /boot/efi     vfat     defaults,noatime     0 2
+            UUID=$ROOT_UUID    /             btrfs    $BTRFS_OPTS,subvol=@ 0 1 
+            UUID=$ROOT_UUID    /home         btrfs    $BTRFS_OPTS,subvol=@home 0 2 
+            UUID=$ROOT_UUID    /.snapshots   btrfs    $BTRFS_OPTS,subvol=@snapshots 0 2 
+            UUID=$ROOT_UUID    /var/log      btrfs    $BTRFS_OPTS,subvol=@var_log 0 2
+            tmpfs              /tmp          tmpfs    defaults,nosuid,nodev     0 0 
+        EOF
+        ```
+> Why i don't know this before :(
 
 #### Configure timezone:
 
@@ -195,7 +220,7 @@ Here you need to be carefull with the UUID of the disks, if you want to know the
 
 #### Create a user:
 
-- Use `useradd -mG wheel $USER`
+- Use `useradd -mG wheel NAMEOFUSER`
 - Use `paswd NAMEOFUSER` to create a new password
 - Add the user to the wheel group, `EDITOR=vim visudo` and uncomment `%wheel ALL= (ALL) ALL`
 
@@ -203,6 +228,9 @@ Here you need to be carefull with the UUID of the disks, if you want to know the
 
 - `grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=VOID`, type this command to install grub.
 - `grub-makeconfig -o /boot/grub/grub.cfg`, update grub config or simply type `update grub`.
+- **Note:** for MBR partitions, or an gpt label in a MBR system execute the following: `grub-install --target=i386-pc /dev/sdx`
+
+> Notice i'm selecting the volume not the partition, is a common error 
 
 #### Update initramfs
 
@@ -265,6 +293,12 @@ In order to use snapper on Void you need to configure it first, so let's do it:
     - `snapper -c root list` => Listed again with the last created snapshot
     - `sudo snapper delete 1` => And delete the snapshot created
     - If you want more information about the snapper commands you can go to [Snapper Wiki](https://wiki.archlinux.org/title/Snapper#Manual_snapshots).
+
+12. Automating the process using cronie:
+
+    - Install cronie with xbps: `sudo xbps-install -Sy cronie`
+    - Enable the service with the symbolic link: `ln -sr /etc/sv/{cronie,crond} /var/service`
+    - And you done, check in the grub if there's snapshots of your sistem  
 
 ## Restoring a snapshot 
 

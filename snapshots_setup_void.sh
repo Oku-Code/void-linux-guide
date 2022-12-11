@@ -25,7 +25,7 @@ snapper_setup () {
     echo "Setting up permisions"
     sleep 3
     sudo chmod a+rx /.snapshots
-    sudo chown :oku /.snapshots
+    sudo chown :$USER /.snapshots
     echo "Set up complete ... reboot the system"
 }
 
