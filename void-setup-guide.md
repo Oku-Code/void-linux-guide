@@ -106,7 +106,7 @@ And now lets mounted the subvolumes:
 - **Snapshots**: `mount -o compress=zstd,noatime,space_cache=v2,subvol=@snapshots /dev/sdx2 /mnt/.snapshots`
 - **Var_log**: `mount -o compress=zstd,noatime,space_cache=v2,subvol=@var_log /dev/sdx2 /var/log`
 
-> You can easily create a variable for the btrfs options like so: `BTRFS_OPTS=compress=zstd,noatime,space_cache=v2,autodegrag`
+> You can easily create a variable for the btrfs options like so: `BTRFS_OPTS=compress=zstd,noatime,space_cache=v2,autodefrag`
 
 #### Mount the efi partition
 
@@ -238,6 +238,9 @@ Here you need to be carefull with the UUID of the disks, if you want to know the
 
 From here you need to exit from the chroot mode and a umount all the partitions, and congratulations you **made it** void is installed with btrfs file system.
 
+- `umount -R /mnt`
+- `shutdown -r now`
+
 ## Configure snapper on void
 
 In order to use snapper on Void you need to configure it first, so let's do it:
@@ -288,7 +291,7 @@ In order to use snapper on Void you need to configure it first, so let's do it:
 
 11. Verify the creation of the snapshots:
 
-    - `snapper -c root list` => list the snapshots presents on the snapper config file **in this coase shows only current**.
+    - `snapper -c root list` => list the snapshots presents on the snapper config file **in this case shows only current**.
     - `sudo snapper -c root create -c timeline -d "Test snapshot"` => Create a test snapshot
     - `snapper -c root list` => Listed again with the last created snapshot
     - `sudo snapper delete 1` => And delete the snapshot created
