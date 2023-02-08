@@ -1,12 +1,4 @@
----
-description: A guide to install void linux with btrfs and snapshots using snapper
-date: 08-02-2021
-rev: 1.2
-author: Oku-Code
----
-
-# Void linux installation guide with btrfs file system, snapper and automatic snapshots and cleanup
-## By Oku
+# Void linux installation guide with btrfs file system, snapper and automatic snapshots and cleanup - By Oku
 
 Hello and welcome, here i'm going to explain the basics about to setup, configure and install **void linux** an independent linux distribution, there are some tricks to get work with btrfs file system, in this case i recommend this guide if you want to have the following:
 
@@ -63,20 +55,25 @@ There are two ways to install void one is to type `void-installer` when you are 
 
 ### Connecting to the network:
 
-- The void xfce iso brings the posibity to connect into the network, so you can use it as well to connect to your network and procced with the next step
-- If you have an wired connection you can skip this steps
-- Using `wpa_supplicant` utility for wifi connections:
-    1. use `ip -a` to identify your network adapter in your case it be `wlslp0, wlan0` or something like that, in my case is `wlo1`
-    2. create a configuration file for your adapter with touch the command `touch /etc/wpa_supplicant/wpa_supplicant-wlo1.conf`
-    3. add the following lines in the apdapter config file using vi command `vi /etc/wpa_supplicant/wpa_supplicant-wlo1.conf`, with `:wq` you write and exit the editor:
-        - ```ctrl_interface=DIR=/run/wpa_supplicant
-             update_config=1```
-    4. Now time to append the information about the network using `wpa_passpharse` command:
-        - `wpa_passphrase SSID PASSWORD >> /etc/wpa_supplicant/wpa_supplicant-wlo1.conf`
-    5. Connect to the network using the config file:
-        - `wpa_supplicant -i -B wlo1 -c /etc/wpa_supplicant/wpa_supplicant-wlo1.conf`
-    6. Check the connection using `ping` command:
-        - `ping https://docs.voidlinux.org`
+The void xfce iso brings the posibity to connect into the network, so you can use it as well to connect to your network and procced with the next step, also if you have an wired connection you can skip this steps.
+
+#### Connecting to a wifi network
+
+1. Using `wpa_supplicant` utility for wifi connections:
+    - use `ip -a` to identify your network adapter in your case it be `wlslp0, wlan0` or something like that, in my case is `wlo1`
+    - create a configuration file for your adapter with touch the command `touch /etc/wpa_supplicant/wpa_supplicant-wlo1.conf`
+    - add the following lines in the apdapter config file using vi command `vi /etc/wpa_supplicant/wpa_supplicant-wlo1.conf`, with `:wq` you write and exit the editor:
+
+```
+ctrl_interface=DIR=/run/wpa_supplicant
+update_config=1
+```
+2. Now time to append the information about the network using `wpa_passpharse` command:
+    - `wpa_passphrase SSID PASSWORD >> /etc/wpa_supplicant/wpa_supplicant-wlo1.conf`
+3. Connect to the network using the config file:
+    - `wpa_supplicant -i -B wlo1 -c /etc/wpa_supplicant/wpa_supplicant-wlo1.conf`
+4. Check the connection using `ping` command:
+    - `ping https://docs.voidlinux.org`
 
 ### Updating xbps package manager:  
 
@@ -194,14 +191,17 @@ Here you need to be careful with the UUID of the disks, if you want to know the 
 > Remember sdx or nvme0n1px is your partition
 
 2. Use the cat command to create the fstab file
-    - ```cat << EOF > /etc/fstab
-            UUID=$UEFI_UUID    /boot/efi     vfat     defaults,noatime     0 2
-            UUID=$ROOT_UUID    /             btrfs    $BTRFS_OPTS,subvol=@ 0 1 
-            UUID=$ROOT_UUID    /home         btrfs    $BTRFS_OPTS,subvol=@home 0 2 
-            UUID=$ROOT_UUID    /.snapshots   btrfs    $BTRFS_OPTS,subvol=@snapshots 0 2 
-            UUID=$ROOT_UUID    /var/log      btrfs    $BTRFS_OPTS,subvol=@var_log 0 2
-            tmpfs              /tmp          tmpfs    defaults,nosuid,nodev     0 0 
-        EOF```
+
+```
+cat << EOF > /etc/fstab
+    UUID=$UEFI_UUID    /boot/efi     vfat     defaults,noatime     0 2
+    UUID=$ROOT_UUID    /             btrfs    $BTRFS_OPTS,subvol=@ 0 1 
+    UUID=$ROOT_UUID    /home         btrfs    $BTRFS_OPTS,subvol=@home 0 2 
+    UUID=$ROOT_UUID    /.snapshots   btrfs    $BTRFS_OPTS,subvol=@snapshots 0 2 
+    UUID=$ROOT_UUID    /var/log      btrfs    $BTRFS_OPTS,subvol=@var_log 0 2
+    tmpfs              /tmp          tmpfs    defaults,nosuid,nodev     0 0 
+EOF
+```
 
 > Why i don't know this before :( - also use the `cat` command to check if all the variables are correct and place it.
 
