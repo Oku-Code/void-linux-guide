@@ -89,9 +89,9 @@ Next is to use `cfdisk /dev/sdx` to create the partitions:
 
 - You need create the `UEFI partition` and the `root partition`, with cfdisk command you can do it.
 - Change the code to efi partition to `ef00`, and write the changes to the disk.
+    > _Tip_: if you have a gpt label, instead install the `gptfdisk` package using the `xbps-install -Sy gptfdisk` command to use gdisk or cgdisk to perform operations on your disks.
 
 > **Note**: if you dont know how your disk is assigned, use `lsblk` command to know it.
-> _Tip_: if you have a gpt label, instead install the `gptfdisk` package using the `xbps-install -Sy gptfdisk` command to use gdisk or cgdisk to perform operations on your disks.
 
 #### Creating the filesystems:
 
@@ -143,7 +143,7 @@ Finally the efi partition:
 > **Note**: if you attempt to install the system with a disk with gpt label on an MBR system remember to create a BIOS Boot Partition on your root of you disk
 this allows to install the grub bootloader properly.
 
-### Installing the base system on Void
+### Installing the base system
 
 Here on void its different, in Archlinux you have **pacstrap** command, but here you need to setup the following varibles before you procced with the installation:
 
@@ -188,7 +188,7 @@ Here you need to be careful with the UUID of the disks, if you want to know the 
     - `UEFI_UUID=$(blkid -s UUID -o value /dev/sdx1)`
     - `ROOT_UUID=$(blkid -s UUID -o value /dev/sdx2)`
 
-> Remember sdx or nvme0n1px is your partition
+> Remember sdx or nvme0n1px or the letter that linux assign to your disk is your partition
 
 2. Use the cat command to create the fstab file
 
@@ -203,7 +203,7 @@ cat << EOF > /etc/fstab
 EOF
 ```
 
-> Why i don't know this before :( - also use the `cat` command to check if all the variables are correct and place it.
+> Why i don't know this before :(, also use the `cat` command to check if all the variables are correct and place it.
 
 #### Configure timezone:
 
@@ -234,19 +234,18 @@ EOF
 
 #### Enabling others serivces
 
-- Use the following command
-    - `ln -srf /etc/sv/{dbus,elogind} /var/service`
+- Use the following command: `ln -srf /etc/sv/{dbus,elogind} /var/service`
 
 #### Enabling network services
 
-- Create the respective symbolic links of the services:
-    - `ln -srf /etc/sv/{dhcpd,dhcpd-eth0} /var/service`
+- Create the respective symbolic links of the services: `ln -srf /etc/sv/{dhcpd,dhcpd-eth0} /var/service`
+
+    > _Tip_: use the `sv` command to check the services are runing when you enter to the system for first time, like this: `sudo sv status /var/service/*`
 
 > **Note**: When you enter on system for first time, you don't have internet connection, in order to connect to the internet again go and do
 the step 5 and 6 in the [Connecting to the network](#connecting-to-the-network) section, on the other hand if you installed the `NetworkManager` package
 you can use the `nmtui` utility and select the wireless network, if you have an internet cable the network is detected automatically.
 
-> _Tip_: use the `sv` command to check the services are runing when you enter to the system for first time, like this: `sudo sv status /var/service/*`
 
 #### Create a root password:
 
@@ -328,21 +327,43 @@ In order to use snapper on Void you need to configure it first, so let's do it:
 
 11. Verify the creation of the snapshots:
 
-    - `snapper -c root list` => list the snapshots presents on the snapper config file **in this case shows only current**.
+    - `snapper -c root list` => list the snapshots presents on the snapper config file **in this case shows only current, that means the snapshot is running**.
     - `sudo snapper -c root create -c timeline -d "Test snapshot"` => Create a test snapshot
     - `snapper -c root list or snapper ls` => Listed again with the last created snapshot
     - `sudo snapper delete 1` => And delete the snapshot created
     - If you want more information about the snapper commands you can go to [Snapper Wiki](https://wiki.archlinux.org/title/Snapper#Manual_snapshots).
 
-> Note: These snapshots are read_only... TODO, INSTRUCTIONS TO MAKE IT WRITE 
+    > Note: These snapshots are read_only, that means you can read it, but not make changes, to make it writable do the folowing:
+        - See the properties of the selected snapshot: `btrfs property list /.snapshots/1/snapshot` => Here we select the number 1, you can select any you want
+        - Make it writable: `btrfs property set -ts /.snapshots/1/snapshot ro false`
+        - Boot in the selected snapshot from grub bootloader and create a file inside of the snapshot 
 
 12. Automating the process using cronie:
 
     - Install cronie with xbps: `sudo xbps-install -Sy cronie`
     - Enable the service with the symbolic link: `ln -s /etc/sv/cronie /var/service` and `ln -s /etc/sv/crond /var/service`
-    > Searching info on the web, i don't how what service is designed to control the schedule, to be sure the snapshots are correctly schedule active this services
     - And you done, create an snapshot with the procedure above and check in the grub menu at startup if there's snapshots of your sistem present in the bootloader
 
+## Doing a rollback to a snapshot
+
+You can rollback a snapshot if you want to test something and goes weird
+
+1. List all the snapshots: `sudo snapper ls`
+2. Create a snapshot of your system: `sudo snapper -c root create -c timeline -d "System testing"` => Define the name you want for you snapshot
+    > **Tip**: Here you can do the things you need to do and think you compromise your system in a dangerous way -> DO IT BY YOUR OWN RISK
+3. Rollback a snapshot: `sudo snapper rollback NUMOFSNAPSHOT` => NUMOFSNAPSHOT is the snapshot selected, you'll get an error
+
+```
+Cannot detect ambit since default subvolume is unknown.
+This can happen if the system was not set up for rollback.
+The ambit can be specified manually using the --ambit option.
+```
+4. Setup the ambit option for snapper: `sudo snapper --ambit classic rollback NUMOFSNAPSHOT` => now you are able to rollback your snapshot
+
+> **Note**: This configuration doesn't have the capability to do snapshots when you are updating or installing a package, so the _pre_ and _post_ snapshots aren't available,
+the rollback option can supply this necesity, but this distribution doesn't have a system hook like Archlinux or a package to manage the changes that made the package manager like 
+dnf on Fedora, so keep that in mind...
+ 
 ## Restoring a snapshot 
 
 Now let's talk about how you can restore your system if everything goes wrong
@@ -366,8 +387,8 @@ This guide is posible thanks to:
 - **Void Linux Handbook**
     - [Void Handbook](https://docs.voidlinux.org/about/index.html).
 
-- **Grabiel Sanchez Handbook**
-    - [Guide by myTerminal](https://gist.github.com/myTerminal/82de59c83b2057868260d7185013e6d1).
+- **Grabiel Sanches's Handbook**
+    - [Guide Grabiel Sanches](https://help.gsr.dev/void-linux/ch01-00-introduction.html)
 
 - **Installation via Chroot**
     - [Guide Chroot](https://docs.voidlinux.org/installation/guides/chroot.html).
@@ -378,6 +399,9 @@ This guide is posible thanks to:
 - **How to connect to the network using wpa_supplicant on void linux by Luca**
     -[Luca Blogpost](https://lucacorbucci.medium.com/how-to-connect-to-wi-fi-from-terminal-using-wpa-supplicant-on-void-linux-9c9fe6ca5403)
 
-> **Note**: All rights belong to their respective authors, this guide doesn't try to infringe copyright, this document is designed for educational proporses only, in the references section you have all the information about the sources that participated in the construction of this document with their respective owners and licenses.
+- **eflinux Youtube Channel**
+    -[eflinux channel](https://www.youtube.com/@eflinux)
+
+> All rights belong to their respective authors, this guide doesn't try to infringe copyright, this document is designed for educational proporses only, in the references section you have all the information about the sources that participated in the construction of this document with their respective owners and licenses.
 
 OkuCode &copy; 2023.
