@@ -218,9 +218,8 @@ EOF
 #### Configure timezone:
 
 - `ln -sf /usr/share/zoneinfo/America/Bogota /etc/localtime`: this set the timezone of your region
-    > _Tip_: You can use the following commands to search your timezone and setting up:
-        - `ls /usr/share/zoneinfo`: this list your region
-        - `ls /usr/share/zoneinfo/America`: here you list your city, _hopefully your find it_
+
+> _Tip_: You can use the following commands to search your timezone and setting up: `ls /usr/share/zoneinfo` to list your region and `ls /usr/share/zoneinfo/America` list your city, _hopefully your find it_
 
 #### Additional config:
 
@@ -352,9 +351,10 @@ In order to use snapper on Void you need to configure it first, so let's do it:
     - If you want more information about the snapper commands you can go to [Snapper Wiki](https://wiki.archlinux.org/title/Snapper#Manual_snapshots).
 
     > **Note**: These snapshots are read_only, that means you can read it, but not make changes, to make it writable do the folowing:
-        - See the properties of the selected snapshot: `btrfs property list /.snapshots/1/snapshot` => Here we select the number 1, you can select any you want
-        - Make it writable: `btrfs property set -ts /.snapshots/1/snapshot ro false`
-        - Boot in the selected snapshot from grub bootloader and create a file inside of the snapshot 
+
+    - See the properties of the selected snapshot: `btrfs property list /.snapshots/1/snapshot` => Here we select the number 1, you can select any you want
+    - Make it writable: `btrfs property set -ts /.snapshots/1/snapshot ro false`
+    - Boot in the selected snapshot from grub bootloader and create a file inside of the snapshot 
 
 12. Automating the process using cronie:
 
@@ -368,7 +368,9 @@ You can rollback a snapshot if you want to test something and goes weird
 
 1. List all the snapshots: `sudo snapper ls`
 2. Create a snapshot of your system: `sudo snapper -c root create -c timeline -d "System testing"` => Define the name you want for you snapshot
-    > **Tip**: Here you can do the things you need to do and think you compromise your system in a dangerous way -> DO IT BY YOUR OWN RISK
+
+> **Tip**: Here you can do the things you need to do and think you compromise your system in a dangerous way -> DO IT BY YOUR OWN RISK
+
 3. Rollback a snapshot: `sudo snapper rollback NUMOFSNAPSHOT` => NUMOFSNAPSHOT is the snapshot selected, you'll get an error
 
 ```
@@ -400,13 +402,13 @@ but i'm going to describe what you need to do, also the steps to follow to resto
 
 ## References
 
-This guide is posible thanks to:
+This guide is posible thanks to this resources:
 
 - **Void Linux Handbook**
     - [Void Handbook](https://docs.voidlinux.org/about/index.html).
 
 - **Grabiel Sanches's Handbook**
-    - [Guide Grabiel Sanches](https://help.gsr.dev/void-linux/ch01-00-introduction.html)
+    - [Guide by Grabiel Sanches](https://help.gsr.dev/void-linux/ch01-00-introduction.html)
 
 - **Installation via Chroot**
     - [Guide Chroot](https://docs.voidlinux.org/installation/guides/chroot.html).
@@ -415,7 +417,7 @@ This guide is posible thanks to:
    - [Snapper Wiki](https://wiki.archlinux.org/title/Snapper).
 
 - **How to connect to the network using wpa_supplicant on void linux by Luca**
-    - [Luca Blogpost](https://lucacorbucci.medium.com/how-to-connect-to-wi-fi-from-terminal-using-wpa-supplicant-on-void-linux-9c9fe6ca5403)
+    - [Blogpost by Luca](https://lucacorbucci.medium.com/how-to-connect-to-wi-fi-from-terminal-using-wpa-supplicant-on-void-linux-9c9fe6ca5403)
 
 - **eflinux Youtube Channel**
     - [eflinux channel](https://www.youtube.com/@eflinux)
