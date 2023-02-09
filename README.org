@@ -1,19 +1,18 @@
 #+Date: 2020-10-27
-#+Author: OkuNull 
-#+Description: A readme file for my repo on gitlab
+#+Author: OkuCode 
+#+Description: A readme file for my void guide repo on gitlab and github
 
 * Void Setup guide
 
-Here i'm again with another guide, in this case i'm cover *Void Linux* distribution, using btrfs and snapper for create snapshots of your system automatically.
+Hola, in this case i'm going to cover *Void Linux* distribution installation, using btrfs and snapper for create snapshots of your system automatically.
 
 ** What do you find here:
 
-1. A writing guide for the installation process of  Void Linux
-2. A script to snapper on void
-3. A installation script for /glibc/ version of void
-4. A fstab template file, if you don't want edit file copied from =/proc/mounts/=, put the UUDIs of your disks and check the btrfs IDS for your subvolumes
+1. A writing guide for the installation process of Void Linux.
+2. Detailed guide to configure snapper, covering the basics of the software.
+3. A fstab template file for reference. 
 
-- *Note*: If you have another partition scheme it's better copy the =/proc/mounts= file into /mnt/etc/ directory and edit like explains on the [[https://docs.voidlinux.org/installation/guides/chroot.html#configure-fstab][wiki page]] or how *myTerminal* explains in their [[https://gist.github.com/myTerminal/82de59c83b2057868260d7185013e6d1#filesystem][guide]].
+- *Note*: If you have another partition scheme it's better copy the =/proc/mounts= file into /mnt/etc/ directory and edit like explains on the [[https://docs.voidlinux.org/installation/guides/chroot.html#configure-fstab][wiki page]].
 
  #+begin_quote
  If you have questions, comments or advices, you can leave it here, or writing me to my email *OkuNull@protonmail.com*, thanks again to the FOSS world.
