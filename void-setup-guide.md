@@ -21,6 +21,9 @@ The document contains the following:
     - [Installing base system](#installing-base-system)
 3. [Void Chroot](#void-chroot)
 4. [Configure snapper on void](#configure-snapper-on-void)
+    - [How to configure snapper on Void Linux](#configure-snapper-on-void)
+    - [How to rollback using snapper](#how-to-rollback-using-snapper)
+    - [How to restore a snapshot using an Archlinux iso](#restoring-a-snapshot)
 5. [Restoring a snapshot](#restoring-a-snapshot)
 6. [References](#references)
 
@@ -49,15 +52,22 @@ Boot into your iso file:
 
 ## Installing Void
 
-There are two ways to install void one is to type `void-installer` when you are loggin as a root user, this step is straight forward, the other method more hard work in order to have the configuration described at the beginning, but here i'm tell you how to do it using `chroot` procedure.
+There are two ways to install void one is to type `void-installer` when you are loggin as a root user, this step is straight forward, the other method involves more effort from your part in order to have the configuration described at the beginning, but here i'm tell you how to do it using `chroot` procedure.
 
 > _Tip_: Void is well documented by their developers, so check it out [here](https://docs.voidlinux.org/about/index.html) if you have some trouble with the installation process.
+
+### Loading your keys
+
+To change the keymaps of your keyboard to the following:
+
+1. Search you keyboard layout: `ls /usr/kbd/keymaps/**/*.map.gz | grep less`
+2. Setting up your keys: `loadkeys de-latin1` => This is for german keyboards, but choose your keyboard distribution instead 
 
 ### Connecting to the network:
 
 The void xfce iso brings the posibity to connect into the network, so you can use it as well to connect to your network and procced with the next step, also if you have an wired connection you can skip this steps.
 
-#### Connecting to a wifi network
+#### Connecting to a wifi network using wpa_supplicant
 
 1. Using `wpa_supplicant` utility for wifi connections:
     - use `ip -a` to identify your network adapter in your case it be `wlslp0, wlan0` or something like that, in my case is `wlo1`
@@ -143,7 +153,7 @@ Finally the efi partition:
 > **Note**: if you attempt to install the system with a disk with gpt label on an MBR system remember to create a BIOS Boot Partition on your root of you disk
 this allows to install the grub bootloader properly.
 
-### Installing the base system
+### Installing base system
 
 Here on void its different, in Archlinux you have **pacstrap** command, but here you need to setup the following varibles before you procced with the installation:
 
@@ -207,7 +217,10 @@ EOF
 
 #### Configure timezone:
 
-- `ln -sf /usr/share/zoneinfo/America/Bogota /etc/localtime`: this generate the locales.
+- `ln -sf /usr/share/zoneinfo/America/Bogota /etc/localtime`: this set the timezone of your region
+    > _Tip_: You can use the following commands to search your timezone and setting up:
+        - `ls /usr/share/zoneinfo`: this list your region
+        - `ls /usr/share/zoneinfo/America`: here you list your city, _hopefully your find it_
 
 #### Additional config:
 
@@ -217,6 +230,11 @@ EOF
 
 - `vim /etc/default/libc-locales`: Uncomment your location
 - `xbps-reconfigure -f glibc-locales`: Generate locales according with your choice
+
+
+#### Synchronize the hardware clock with the system clock
+
+- `hwclock --systohc`: this sychronize the system clock
 
 #### Setting hostname:
 
@@ -333,7 +351,7 @@ In order to use snapper on Void you need to configure it first, so let's do it:
     - `sudo snapper delete 1` => And delete the snapshot created
     - If you want more information about the snapper commands you can go to [Snapper Wiki](https://wiki.archlinux.org/title/Snapper#Manual_snapshots).
 
-    > Note: These snapshots are read_only, that means you can read it, but not make changes, to make it writable do the folowing:
+    > **Note**: These snapshots are read_only, that means you can read it, but not make changes, to make it writable do the folowing:
         - See the properties of the selected snapshot: `btrfs property list /.snapshots/1/snapshot` => Here we select the number 1, you can select any you want
         - Make it writable: `btrfs property set -ts /.snapshots/1/snapshot ro false`
         - Boot in the selected snapshot from grub bootloader and create a file inside of the snapshot 
@@ -344,7 +362,7 @@ In order to use snapper on Void you need to configure it first, so let's do it:
     - Enable the service with the symbolic link: `ln -s /etc/sv/cronie /var/service` and `ln -s /etc/sv/crond /var/service`
     - And you done, create an snapshot with the procedure above and check in the grub menu at startup if there's snapshots of your sistem present in the bootloader
 
-## Doing a rollback to a snapshot
+## How to rollback using snapper
 
 You can rollback a snapshot if you want to test something and goes weird
 
@@ -397,10 +415,10 @@ This guide is posible thanks to:
    - [Snapper Wiki](https://wiki.archlinux.org/title/Snapper).
 
 - **How to connect to the network using wpa_supplicant on void linux by Luca**
-    -[Luca Blogpost](https://lucacorbucci.medium.com/how-to-connect-to-wi-fi-from-terminal-using-wpa-supplicant-on-void-linux-9c9fe6ca5403)
+    - [Luca Blogpost](https://lucacorbucci.medium.com/how-to-connect-to-wi-fi-from-terminal-using-wpa-supplicant-on-void-linux-9c9fe6ca5403)
 
 - **eflinux Youtube Channel**
-    -[eflinux channel](https://www.youtube.com/@eflinux)
+    - [eflinux channel](https://www.youtube.com/@eflinux)
 
 > All rights belong to their respective authors, this guide doesn't try to infringe copyright, this document is designed for educational proporses only, in the references section you have all the information about the sources that participated in the construction of this document with their respective owners and licenses.
 
