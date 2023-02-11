@@ -17,6 +17,7 @@ The document contains the following:
 2. [Installing Void](#installing-void)
     - [Connecting to the network](#connecting-to-the-network)
     - [Updating xbps package manager](#updating-xbps-package-manager)
+    - [Selecting the faster mirror for faster downloads](#changer-mirrors-for-faster-downloads)
     - [Partitioning your disk](#partitioning-your-disk)
     - [Installing base system](#installing-base-system)
 3. [Void Chroot](#void-chroot)
@@ -84,6 +85,21 @@ update_config=1
     - `wpa_supplicant -i -B wlo1 -c /etc/wpa_supplicant/wpa_supplicant-wlo1.conf`
 4. Check the connection using `ping` command:
     - `ping https://docs.voidlinux.org`
+
+### Change mirrors for faster downloads
+
+It's important to have a good speed for downloads here i suggest two procedures in order to have a good download speeds:
+
+#### Using the file localted in `/usr/share/xbps.d/00-repository.conf`
+
+- Copy the file located in `/usr/share/xbps.d/00-repository.conf` on `/etc/xbps.d/`
+- Use vi or other text editor and replace the default mirror for one nearest of your location, you can check the list of mirrors [here](https://docs.voidlinux.org/xbps/repositories/mirrors/index.html). 
+
+#### Using the xmirrors utility
+
+After you active your internet connection you can install with xbps the `xmirror` package and select your mirror from there
+
+- `xmirror -l /usr/share/xmirror/mirrors.lst` => This launch the TUI utility and configure the mirror of your preference
 
 ### Updating xbps package manager:  
 
