@@ -17,7 +17,7 @@ The document contains the following:
 2. [Installing Void](#installing-void)
     - [Connecting to the network](#connecting-to-the-network)
     - [Updating xbps package manager](#updating-xbps-package-manager)
-    - [Selecting the faster mirror for faster downloads](#changer-mirrors-for-faster-downloads)
+    - [Selecting the fastest mirror for faster downloads](#change-mirrors-for-faster-downloads)
     - [Partitioning your disk](#partitioning-your-disk)
     - [Installing base system](#installing-base-system)
 3. [Void Chroot](#void-chroot)
