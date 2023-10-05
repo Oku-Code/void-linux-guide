@@ -71,9 +71,6 @@ Void Linux iso is so lightweight, you can download it from [[https://voidlinux.o
     your motherboard or laptop, in some cases the key is *F11* or *Del*
     but i recommend to search how to start in the boot menu.
 
-
-
-
 * Installing Void Linux
 
 There are two ways to install void, one of them is open a new terminal
@@ -272,7 +269,50 @@ Let's mount this subvolumes and the remaining partitions
 
 ** Installing the base system
 
-* Void Chroot
+Here on void it's different, in archlinux you have the *pacstrap*
+command, but here you need to setup the following variables before you
+procced with the installation:
+
+1. Defining the main repo variable:
+   ~REPO=https://repo-fastly.voidlinux.org/current~ you can change it
+   looking in the [[https://docs.voidlinux.org/xbps/repositories/mirrors/index.html][mirrors]] section of the handbook.
+
+2. Defining the archquitecture variable: ~ARCH=X86_64~
+
+3. Bootstraping the base system: Now you need to install the system
+   and the packages, here you specify what you want, this is an
+   example.
+   
+ #+begin_quote
+XBPS_ARCH=$ARCH xbps-install -S -r /mnt -R "$REPO" base-system sudo
+vim git btrfs-progs base-devel efibootmgr mtools dosfstools grub-btrfs grub-x86_64-efi
+elogind dus void-repo-nonfree
+#+end_quote
+
+4. Copy the DNS config: ~cp /etc/resolv.conf /mnt/etc~
+
+5. Copy the wifi adapter configuration: ~cp /etc/wpa_supplicant/wpa_supplicant-wlo1.conf~
+
+6. Entering chroot mode with xchroot, if you don't have installed yet
+   installed with ~xbps-install -Sy xtools~: ~xchroot /mnt /bin/bash~
+   
+#+begin_quote
+*Note*: The packages btrfs-progs and grub-btrfs are necesary for this
+ type of file system; At this point you can install the desktop
+ enviroment of your choice, programs and more utilities, but it's
+ better to do after you have a base installation, also the
+ ~void-repo-nonfree~ package contains the ~intel-ucode~ package for Intel cpus.
+
+*Note 2*: xtools provides a easy way to chroot in your base installation,
+ if you prefer do it manually you can go [[https://docs.voidlinux.org/config/containers-and-vms/chroot.html#manual-method][here]].
+ 
+*Note 3*: copy the adapter configuration allows you to connect to the
+ network again, without created a new config in to your new system, in
+ order to connect to the network you need to enable the 
+ ~dhcpd~ service and do the steps described in *Connecting to the network section*. 
+#+end_quote
+
+* Void Chroot 
 
 * Configure Snapper on Void Linux
 
